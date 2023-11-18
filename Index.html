@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Contrast Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    #color-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2185d0;
+    }
+
+    #contrast-result {
+      font-size: 18px;
+      color: #333;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="color-container">
+  <label for="color1">Color 1:</label>
+  <input type="color" id="color1">
+
+  <label for="color2">Color 2:</label>
+  <input type="color" id="color2">
+
+  <button onclick="checkContrast()">Check Contrast</button>
+
+  <div id="contrast-result"></div>
+</div>
+
+<script>
+  function checkContrast() {
+    const color1 = document.getElementById('color1').value;
+    const color2 = document.getElementById('color2').value;
+
+    const contrastRatio = getContrastRatio(color1, color2);
+
+    const resultElement = document.getElementById('contrast-result');
+
+    if (contrastRatio >= 4.5) {
+      resultElement.textContent = `Contrast Ratio: ${contrastRatio.toFixed(2)} (Pass - Sufficient Contrast)`;
+      resultElement.style.color = '#4CAF50';  // Green color for passing contrast
+    } else {
+      resultElement.textContent = `Contrast Ratio: ${contrastRatio.toFixed(2)} (Fail - Insufficient Contrast)`;
+      resultElement.style.color = '#FF0000';  // Red color for failing contrast
+    }
+  }
+
+  function getContrastRatio(color1, color2) {
+    const luminance1 = getLuminance(color1);
+    const luminance2 = getLuminance(color2);
+
+    const lighter = Math.max(luminance1, luminance2);
+    const darker = Math.min(luminance1, luminance2);
+
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  function getLuminance(color) {
+    const rgb = parseInt(color.slice(1), 16);  // Convert hex to decimal
+    const r = (rgb >> 16) & 0xff;  // Extract red
+    const g = (rgb >>  8) & 0xff;  // Extract green
+    const b = (rgb >>  0) & 0xff;  // Extract blue
+
+    const sRGB = [r, g, b].map(value => {
+      value /= 255;
+      return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+    });
+
+    return sRGB[0] * 0.2126 + sRGB[1] * 0.7152 + sRGB[2] * 0.0722;
+  }
+</script>
+
+</body>
+</html>
